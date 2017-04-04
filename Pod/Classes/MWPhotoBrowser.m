@@ -352,7 +352,7 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
     if (!_viewIsActive && [self.navigationController.viewControllers objectAtIndex:0] != self) {
         [self storePreviousNavBarAppearance];
     }
-    [self setNavBarAppearance:animated];
+  //  [self setNavBarAppearance:animated];
     
     // Update UI
 	[self hideControlsAfterDelay];
@@ -439,10 +439,10 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
 
 #pragma mark - Nav Bar Appearance
 
-- (void)setNavBarAppearance:(BOOL)animated {
+- (void)setNavBarAppearance:(BOOL)animated tintColor: (UIColor *) tintColor {
     [self.navigationController setNavigationBarHidden:NO animated:animated];
     UINavigationBar *navBar = self.navigationController.navigationBar;
-    navBar.tintColor = [UIColor whiteColor];
+    navBar.tintColor = tintColor;
     navBar.barTintColor = nil;
     navBar.shadowImage = nil;
     navBar.translucent = YES;

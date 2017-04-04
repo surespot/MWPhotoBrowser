@@ -72,4 +72,6 @@
 - (void)showNextPhotoAnimated:(BOOL)animated;
 - (void)showPreviousPhotoAnimated:(BOOL)animated;
 
+- (void)setNavBarAppearance:(BOOL)animated tintColor: (UIColor *) tintColor;
+
 @end
