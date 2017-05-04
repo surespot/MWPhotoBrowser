@@ -221,42 +221,6 @@
 
 #pragma mark - Setup
 
-- (CGFloat)initialZoomScaleWithMinScale {
-    CGFloat zoomScale = self.minimumZoomScale;
-    if (_photoImageView && _photoBrowser.zoomPhotosToFill) {
-        // Zoom image to fill if the aspect ratios are fairly similar
-        CGSize boundsSize = self.bounds.size;
-        CGSize imageSize = _photoImageView.image.size;
-        CGFloat boundsAR = boundsSize.width / boundsSize.height;
-        CGFloat imageAR = imageSize.width / imageSize.height;
-        CGFloat xScale = boundsSize.width / imageSize.width;    // the scale needed to perfectly fit the image width-wise
-        CGFloat yScale = boundsSize.height / imageSize.height;  // the scale needed to perfectly fit the image height-wise
-        // Zooms standard portrait images on a 3.5in screen but not on a 4in screen.
-        if (ABS(boundsAR - imageAR) < 0.17) {
-            zoomScale = MAX(xScale, yScale);
-            // Ensure we don't zoom in or out too far, just in case
-            zoomScale = MIN(MAX(self.minimumZoomScale, zoomScale), self.maximumZoomScale);
-        }
-        // Zooms standard portrait images on a 3.5in screen but not on a 4in screen.
-        if (ABS(boundsAR - imageAR) < 0.17) {
-            zoomScale = MAX(xScale, yScale);
-            // Ensure we don't zoom in or out too far, just in case
-            zoomScale = MIN(MAX(self.minimumZoomScale, zoomScale), self.maximumZoomScale);
-        }
-        else // Screen size > 3.5in : Adapt according device orientation
-        {
-            if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation))
-            {
-                zoomScale = xScale; // scale to fit on screen width only in portrait mode
-            }
-            else
-            {
-                zoomScale = yScale; // scale to fit on screen height only in landscape mode
-            }
-        }
-    }
-    return zoomScale;
-}
 
 - (void)setMaxMinZoomScalesForCurrentBounds {
     
@@ -286,48 +250,14 @@
         // Let them go a bit bigger on a bigger screen!
         maxScale = 4;
     }
-    
-    // Image is smaller than screen so no zooming!
-    if (xScale >= 1 && yScale >= 1) {
-        minScale = 1.0;
-    }
-    
+
     // Set min/max zoom
     self.maximumZoomScale = maxScale;
     self.minimumZoomScale = minScale;
     
     // Initial zoom
-    self.zoomScale = [self initialZoomScaleWithMinScale];
-    
-    CGFloat boundsAR = boundsSize.width / boundsSize.height;
-    CGFloat imageAR = imageSize.width / imageSize.height;
-    
-    // If we're zooming to fill then centralise
-    if (self.zoomScale != minScale) {
-        
-        // Centralise
-        self.contentOffset = CGPointMake((imageSize.width * self.zoomScale - boundsSize.width) / 2.0,
-                                         (imageSize.height * self.zoomScale - boundsSize.height) / 2.0);        
-        
-    }
-    else if ( (ABS(boundsAR - imageAR) > 0.17) ) // Screen size > 3.5in : Adapt according device orientation
-    {
-        if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation))
-        {
-            // Centralise
-            self.contentOffset = CGPointMake((imageSize.width * self.zoomScale - boundsSize.width) / 2.0,
-                                             0.0);
-        }
-        else
-        {
-            // Centralise
-            self.contentOffset = CGPointMake(0.0,
-                                             (imageSize.height * self.zoomScale - boundsSize.height) / 2.0);
-        }
-        
-        // Disable scrolling initially until the first pinch to fix issues with swiping on an initally zoomed in photo
-        self.scrollEnabled = NO;
-    }
+    self.zoomScale =  minScale;
+
     
     // Disable scrolling initially until the first pinch to fix issues with swiping on an initally zoomed in photo
     self.scrollEnabled = NO;
@@ -430,7 +360,7 @@
     [NSObject cancelPreviousPerformRequestsWithTarget:_photoBrowser];
     
     // Zoom
-    if (self.zoomScale != self.minimumZoomScale && self.zoomScale != [self initialZoomScaleWithMinScale]) {
+    if (self.zoomScale != self.minimumZoomScale) {
         
         // Zoom out
         [self setZoomScale:self.minimumZoomScale animated:YES];
